@@ -1,0 +1,53 @@
+openapi: 3.0.0
+info:
+  title: Avatar API
+  description: A deterministic avatar delivery service using Cloudflare Workers.
+  version: 1.0.0
+servers:
+  - url: https://avatarapi.smrk.workers.dev
+    description: Production server
+paths:
+  /:
+    get:
+      summary: Get an avatar image
+      description: Returns a deterministic avatar image based on a hash of the provided ID and gender.
+      parameters:
+        - name: id
+          in: query
+          description: Unique identifier for the user to ensure deterministic results.
+          required: false
+          schema:
+            type: string
+        - name: gender
+          in: query
+          description: Gender theme for the avatar.
+          required: false
+          schema:
+            type: string
+            enum: [boy, girl]
+        - name: format
+          in: query
+          description: Desired image format.
+          required: false
+          schema:
+            type: string
+            enum: [webp, png, avif]
+            default: webp
+      responses:
+        '200':
+          description: An avatar image
+          content:
+            image/webp:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/avif:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Avatar asset not found
