@@ -48,19 +48,22 @@ export default {
       // Random default if both are missing
       selectedGender = Math.random() > 0.5 ? "boy" : "girl";
       finalIndex = Math.floor(Math.random() * 50) + 1;
+      if (selectedGender === "girl") finalIndex += 50;
     } else if (!id && gender) {
       // Deterministic default if gender is provided but id is missing
       selectedGender = validGenders.includes(gender) ? (gender as "boy" | "girl") : "boy";
       finalIndex = await getDeterministicIndex("default-avatar", 50);
+      if (selectedGender === "girl") finalIndex += 50;
+    } else if (id && !gender) {
+      // Deterministic gender and index when ONLY ID is provided
+      const globalIndex = await getDeterministicIndex(id, 100);
+      selectedGender = globalIndex <= 50 ? "boy" : "girl";
+      finalIndex = globalIndex;
     } else {
-      // Case: id is provided (with or without gender)
+      // Deterministic index within a specific gender
       selectedGender = validGenders.includes(gender!) ? (gender as "boy" | "girl") : "boy";
       finalIndex = await getDeterministicIndex(id!, 50);
-    }
-
-    // Shift index for girls (they are 51-100)
-    if (selectedGender === "girl") {
-      finalIndex += 50;
+      if (selectedGender === "girl") finalIndex += 50;
     }
 
     return this.serveAsset(selectedGender, finalIndex, format, env, request);
